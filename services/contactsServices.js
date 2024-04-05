@@ -28,9 +28,9 @@ export async function removeContact(contactId) {
   }
 }
 
-export async function addContact(name, email, phone) {
+export async function addContact(name, email, phone, favorite = false) {
   try {
-    const newContact = await Contact.create({ name, email, phone });
+    const newContact = await Contact.create({ name, email, phone, favorite });
     return newContact;
   } catch (error) {
     console.log(error.message);
@@ -38,11 +38,14 @@ export async function addContact(name, email, phone) {
   }
 }
 
-export async function updateContactById(contactId, { name, email, phone }) {
+export async function updateContactById(
+  contactId,
+  { name, email, phone, favorite }
+) {
   try {
     const updatedContact = await Contact.findByIdAndUpdate(
       contactId,
-      { name, email, phone },
+      { name, email, phone, favorite },
       { new: true }
     );
     return updatedContact;
