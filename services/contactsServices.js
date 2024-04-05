@@ -2,7 +2,7 @@ import { Contact } from "../models/contactsModel.js";
 
 export async function listContacts() {
   try {
-    const contacts = await User.find();
+    const contacts = await Contact.find();
     return contacts;
   } catch (error) {
     console.log(error.message);
@@ -48,5 +48,19 @@ export async function updateContactById(contactId, { name, email, phone }) {
     return updatedContact;
   } catch (error) {
     console.log(error.message);
+  }
+}
+
+export async function updateStatusContact(contactId, favorite) {
+  try {
+    const updatedContact = await Contact.findByIdAndUpdate(
+      contactId,
+      { favorite },
+      { new: true }
+    );
+    return updatedContact;
+  } catch (error) {
+    console.log(error.message);
+    return null;
   }
 }

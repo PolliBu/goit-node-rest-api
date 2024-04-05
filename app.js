@@ -8,12 +8,16 @@ import contactsRouter from "./routes/contactsRouter.js";
 
 dotenv.config();
 
+const { MONGODB_URL, PORT } = process.env;
 const app = express();
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(MONGODB_URL)
 
   .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running. Use our API on port: ${PORT}`);
+    });
     console.log("Database connection successful");
   })
   .catch((err) => {
@@ -34,10 +38,4 @@ app.use((_, res) => {
 app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
-});
-
-const port = +process.env.PORT;
-
-app.listen(port, () => {
-  console.log(`Server is running. Use our API on port: ${port}`);
 });

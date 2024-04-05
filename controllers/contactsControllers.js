@@ -4,6 +4,7 @@ import {
   removeContact,
   addContact,
   updateContactById,
+  updateStatusContact,
 } from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
 
@@ -67,6 +68,22 @@ export const updateContact = async (req, res, next) => {
     }
 
     return res.status(200).json(updatedContact);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateContactFavoriteStatus = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const { favorite } = req.body;
+
+    const updatedContact = await updateStatusContact(contactId, favorite);
+    if (!updatedContact) {
+      return next(HttpError(404));
+    }
+
+    res.status(200).json(updatedContact);
   } catch (error) {
     next(error);
   }
