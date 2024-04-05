@@ -1,4 +1,4 @@
-import { User } from "../models/contactsModel.js";
+import { Contact } from "../models/contactsModel.js";
 
 export async function listContacts() {
   try {
@@ -11,7 +11,7 @@ export async function listContacts() {
 
 export async function getContactById(contactId) {
   try {
-    const contact = await User.findById(contactId);
+    const contact = await Contact.findById(contactId);
     return contact;
   } catch (error) {
     console.log(error.message);
@@ -21,7 +21,7 @@ export async function getContactById(contactId) {
 
 export async function removeContact(contactId) {
   try {
-    const deletedContact = await User.findByIdAndDelete(contactId);
+    const deletedContact = await Contact.findByIdAndDelete(contactId);
     return deletedContact;
   } catch (error) {
     console.log(error.message);
@@ -30,7 +30,7 @@ export async function removeContact(contactId) {
 
 export async function addContact(name, email, phone) {
   try {
-    const newContact = await User.create({ name, email, phone });
+    const newContact = await Contact.create({ name, email, phone });
     return newContact;
   } catch (error) {
     console.log(error.message);
@@ -40,7 +40,7 @@ export async function addContact(name, email, phone) {
 
 export async function updateContactById(contactId, { name, email, phone }) {
   try {
-    const updatedContact = await User.findByIdAndUpdate(
+    const updatedContact = await Contact.findByIdAndUpdate(
       contactId,
       { name, email, phone },
       { new: true }
