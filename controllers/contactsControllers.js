@@ -7,6 +7,7 @@ import {
   updateStatusContact,
 } from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
+import mongoose from "mongoose";
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -20,6 +21,9 @@ export const getAllContacts = async (req, res, next) => {
 export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid contact ID" });
+    }
     const contact = await getContactById(id);
     if (!contact) {
       return next(HttpError(404));
@@ -57,6 +61,10 @@ export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, email, phone, favorite } = req.body;
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "Request body is missing" });
+    }
 
     if (!name && !email && !phone && favorite === undefined) {
       return next("Body must have at least one field");
