@@ -7,7 +7,6 @@ import {
   updateStatusContact,
 } from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
-import mongoose from "mongoose";
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -21,9 +20,6 @@ export const getAllContacts = async (req, res, next) => {
 export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid contact ID" });
-    }
     const contact = await getContactById(id);
     if (!contact) {
       return next(HttpError(404));
@@ -89,10 +85,10 @@ export const updateContact = async (req, res, next) => {
 
 export const updateContactFavoriteStatus = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
+    const { id } = req.params;
     const { favorite } = req.body;
 
-    const updatedContact = await updateStatusContact(contactId, favorite);
+    const updatedContact = await updateStatusContact(id, favorite);
     if (!updatedContact) {
       return next(HttpError(404));
     }
