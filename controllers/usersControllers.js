@@ -1,3 +1,6 @@
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 import HttpError from "../helpers/HttpError.js";
 import {
   createUser,
@@ -23,26 +26,20 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await loginUser(email);
+    const user = await loginUser({ email });
     if (!user) {
       throw HttpError(401, "Email or password is wrong");
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
+    const passwordCompare = await bcrypt.compare(password, user.password);
+    if (!passwordCompare) {
       throw HttpError(401, "Email or password is wrong");
     }
-
-    const token = jsonWebToken.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET
-    );
-
+    const payload = {
+      id: user._id,
+    };
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
     res.status(200).json({
       token,
-      user: {
-        email: user.email,
-        subscription: user.subscription,
-      },
     });
   } catch (error) {
     next(error);

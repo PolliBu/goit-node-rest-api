@@ -1,5 +1,5 @@
 import jsonWebToken from "jsonwebtoken";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 import { User } from "../models/usersModel.js";
 
 export const findUserByEmail = async (email) => {
@@ -27,7 +27,7 @@ export const loginUser = async (email) => {
   if (!user) return null;
 
   return {
-    token: jsonwebtoken.sign({ userId: user._id }, process.env.JWT_SECRET),
+    token: jsonwebtoken.sign({ userId: user._id }, process.env.SECRET_KEY),
     user,
   };
 };
