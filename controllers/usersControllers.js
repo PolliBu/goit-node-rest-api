@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
 import HttpError from "../helpers/HttpError.js";
 import {
   createUser,
@@ -18,7 +17,9 @@ export const register = async (req, res, next) => {
       throw HttpError(409, "Email in use");
     }
     const newUser = await createUser(req.body);
-    res.status(201).json({ newUser });
+    res
+      .status(201)
+      .json({ email: newUser.email, subscription: newUser.subscription });
   } catch (err) {
     console.log(err);
     next(err);
@@ -28,7 +29,7 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await loginUser({ email });
+    const user = await loginUser(email);
     if (!user) {
       throw HttpError(401, "Email or password is wrong");
     }
@@ -39,9 +40,15 @@ export const login = async (req, res, next) => {
     const payload = {
       id: user._id,
     };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1w" });
+    const token = jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: "1w",
+    });
     res.status(200).json({
       token,
+      user: {
+        email: user.email,
+        subscription: user.subscription,
+      },
     });
   } catch (error) {
     next(error);

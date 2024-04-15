@@ -1,5 +1,6 @@
+import jwt from "jsonwebtoken";
 import jsonWebToken from "jsonwebtoken";
-// import bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import { User } from "../models/usersModel.js";
 
 export const findUserByEmail = async (email) => {
@@ -26,8 +27,10 @@ export const loginUser = async (email) => {
   const user = await User.findOne({ email });
   if (!user) return null;
 
+  const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
+
   return {
-    token: jsonwebtoken.sign({ userId: user._id }, process.env.SECRET_KEY),
+    token,
     user,
   };
 };
