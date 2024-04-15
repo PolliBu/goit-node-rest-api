@@ -31,3 +31,18 @@ export const loginUser = async (email) => {
     user,
   };
 };
+
+export const logoutUser = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) return null;
+
+  user.token = null;
+  await user.save();
+
+  return user;
+};
+
+export const getCurrentUser = async (userId) => {
+  const user = await User.findById(userId);
+  return user;
+};

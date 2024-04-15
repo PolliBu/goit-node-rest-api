@@ -6,6 +6,8 @@ import {
   createUser,
   findUserByEmail,
   loginUser,
+  logoutUser,
+  getCurrentUser,
 } from "../services/usersServices.js";
 
 export const register = async (req, res, next) => {
@@ -37,10 +39,34 @@ export const login = async (req, res, next) => {
     const payload = {
       id: user._id,
     };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1w" });
     res.status(200).json({
       token,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    const user = await logoutUser(req.user._id);
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+    res.sendStatus(204);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const current = async (req, res, next) => {
+  try {
+    const user = await getCurrentUser(req.user._id);
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }
