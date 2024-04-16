@@ -4,10 +4,13 @@ import HttpError from "../helpers/HttpError.js";
 import {
   createUser,
   findUserByEmail,
-  loginUser,
   logoutUser,
   getCurrentUser,
 } from "../services/usersServices.js";
+import { User } from "../models/usersModel.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const register = async (req, res, next) => {
   try {
@@ -29,7 +32,7 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await loginUser(email);
+    const user = await User.findOne({ email });
     if (!user) {
       throw HttpError(401, "Email or password is wrong");
     }

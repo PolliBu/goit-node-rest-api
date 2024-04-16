@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/usersModel.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const findUserByEmail = async (email) => {
   const user = await User.findOne({ email });
@@ -20,16 +23,16 @@ export const createUser = async (userData) => {
   return user;
 };
 
-export const loginUser = async (email) => {
-  const user = await User.findOne({ email });
-  if (!user) return null;
-  const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+// export const loginUser = async (email) => {
+//   const user = await User.findOne({ email });
+//   if (!user) return null;
+//   const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
 
-  return {
-    token,
-    user,
-  };
-};
+//   return {
+//     token,
+//     user,
+//   };
+// };
 
 export const logoutUser = async (userId) => {
   const user = await User.findById(userId);

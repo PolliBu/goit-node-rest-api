@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 import { User } from "../models/usersModel.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const checkToken = (token) => {
   try {
