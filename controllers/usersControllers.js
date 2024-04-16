@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 import {
@@ -33,7 +33,7 @@ export const login = async (req, res, next) => {
     if (!user) {
       throw HttpError(401, "Email or password is wrong");
     }
-    const passwordCompare = await bcrypt.compare(password, user.password);
+    const passwordCompare = await bcryptjs.compare(password, user.password);
     if (!passwordCompare) {
       throw HttpError(401, "Email or password is wrong");
     }
@@ -57,9 +57,10 @@ export const login = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    const user = await logoutUser(req.user._id);
+    const userId = req.user._id;
+    const user = await logoutUser(userId);
     if (!user) {
-      throw HttpError(404, "User not found");
+      return next(HttpError(401, "Not authorized"));
     }
     res.sendStatus(204);
   } catch (error) {
@@ -69,11 +70,15 @@ export const logout = async (req, res, next) => {
 
 export const current = async (req, res, next) => {
   try {
-    const user = await getCurrentUser(req.user._id);
+    const userId = req.user._id;
+    const user = await getCurrentUser(userId);
     if (!user) {
-      throw HttpError(404, "User not found");
+      return next(HttpError(401, "Not authorized"));
     }
-    res.status(200).json(user);
+    res.status(200).json({
+      email: user.email,
+      subscription: user.subscription,
+    });
   } catch (error) {
     next(error);
   }
