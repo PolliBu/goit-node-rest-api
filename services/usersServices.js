@@ -23,17 +23,6 @@ export const createUser = async (userData) => {
   return user;
 };
 
-// export const loginUser = async (email) => {
-//   const user = await User.findOne({ email });
-//   if (!user) return null;
-//   const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
-
-//   return {
-//     token,
-//     user,
-//   };
-// };
-
 export const logoutUser = async (userId) => {
   const user = await User.findById(userId);
   if (!user) return null;

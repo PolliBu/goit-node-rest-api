@@ -14,28 +14,36 @@ import {
 } from "../schemas/contactsSchemas.js";
 import validateBody from "../helpers/validateBody.js";
 import isValidId from "../middlewares/isValidId.js";
+import isAuthorization from "../middlewares/isAuthorization.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/", isAuthorization, getAllContacts);
 
-contactsRouter.get("/:id", isValidId, getOneContact);
+contactsRouter.get("/:id", isAuthorization, isValidId, getOneContact);
 
-contactsRouter.delete("/:id", isValidId, deleteContact);
+contactsRouter.delete("/:id", isAuthorization, isValidId, deleteContact);
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+contactsRouter.post(
+  "/",
+  validateBody(createContactSchema),
+  isAuthorization,
+  createContact
+);
 
 contactsRouter.put(
   "/:id",
-  isValidId,
   validateBody(updateContactSchema),
+  isAuthorization,
+  isValidId,
   updateContact
 );
 
 contactsRouter.patch(
   "/:id/favorite",
-  isValidId,
   validateBody(updateFavoriteSchema),
+  isAuthorization,
+  isValidId,
   updateContactFavoriteStatus
 );
 

@@ -7,10 +7,12 @@ import {
   updateStatusContact,
 } from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
+import { Contact } from "../models/contactsModel.js";
 
 export const getAllContacts = async (req, res, next) => {
   try {
-    const contacts = await listContacts();
+    const owner = req.user.id;
+    const contacts = await listContacts(owner);
     res.json(contacts);
   } catch (error) {
     next(error);
@@ -20,7 +22,8 @@ export const getAllContacts = async (req, res, next) => {
 export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const contact = await getContactById(id);
+    const owner = req.user.id;
+    const contact = await getContactById(id, owner);
     if (!contact) {
       return next(HttpError(404));
     }
@@ -33,7 +36,8 @@ export const getOneContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const deletedContact = await removeContact(id);
+    const owner = req.user.id;
+    const deletedContact = await removeContact(id, owner);
     if (!deletedContact) {
       return next(HttpError(404));
     }
@@ -46,7 +50,16 @@ export const deleteContact = async (req, res, next) => {
 export const createContact = async (req, res, next) => {
   try {
     const { name, email, phone } = req.body;
-    const newContact = await addContact(name, email, phone);
+    const owner = req.user.id;
+    const existingContact = await Contact.findOne({
+      $or: [{ email }, { phone }],
+    });
+    if (existingContact) {
+      return res.status(400).json({
+        message: "Contact with the same email or phone already exists",
+      });
+    }
+    const newContact = await addContact(name, email, phone, owner);
     res.status(201).json(newContact);
   } catch (error) {
     next(error);
@@ -57,6 +70,7 @@ export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, email, phone, favorite } = req.body;
+    const owner = req.user.id;
 
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({ message: "Request body is missing" });
@@ -71,6 +85,7 @@ export const updateContact = async (req, res, next) => {
       email,
       phone,
       favorite,
+      owner,
     });
 
     if (!updatedContact) {
@@ -87,8 +102,9 @@ export const updateContactFavoriteStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { favorite } = req.body;
+    const owner = req.user.id;
 
-    const updatedContact = await updateStatusContact(id, favorite);
+    const updatedContact = await updateStatusContact(id, favorite, owner);
     if (!updatedContact) {
       return next(HttpError(404));
     }

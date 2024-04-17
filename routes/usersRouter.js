@@ -11,16 +11,12 @@ import isAuthorization from "../middlewares/isAuthorization.js";
 
 const usersRouter = express.Router();
 
-// signup
 usersRouter.post("/register", validateBody(registerSchema), register);
 
-// signin
 usersRouter.post("/login", validateBody(loginSchema), login);
 
-// logout
 usersRouter.post("/logout", isAuthorization, logout);
 
-// current user
 usersRouter.get("/current", isAuthorization, current);
 
 export default usersRouter;
