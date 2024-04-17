@@ -5,18 +5,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const checkToken = (token) => {
+export const getUserByToken = async (token) => {
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-    const userId = decodedToken.userId;
-    return userId;
-  } catch (error) {
-    return null;
-  }
-};
-
-const getUserByIdService = async (userId) => {
-  try {
+    const userId = decodedToken.id;
     const user = await User.findById(userId);
     return user;
   } catch (error) {
@@ -25,29 +17,21 @@ const getUserByIdService = async (userId) => {
 };
 
 const isAuthorization = async (req, res, next) => {
-  const token =
-    req.headers.authorization?.startsWith("Bearer ") &&
-    req.headers.authorization.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return next(HttpError(401, "Not authorized"));
   }
 
-  const userId = checkToken(token);
-
-  if (!userId) {
-    return next(HttpError(401, "Not authorized"));
-  }
-
   try {
-    const currentUser = await getUserByIdService(userId);
-    if (!currentUser || currentUser.token !== token) {
-      return next(new HttpError(401, "Not authorized"));
+    const currentUser = await getUserByToken(token);
+    if (!currentUser) {
+      return next(HttpError(401, "Not authorized"));
     }
     req.user = currentUser;
     next();
   } catch (error) {
-    next(error);
+    next(HttpError(401, "Not authorized"));
   }
 };
 
