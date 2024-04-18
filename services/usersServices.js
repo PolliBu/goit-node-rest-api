@@ -9,7 +9,7 @@ export const findUserByEmail = async (email) => {
   return user;
 };
 
-const updateUserWithToken = async (id) => {
+export const updateUserWithToken = async (id) => {
   const token = jwt.sign({ id }, process.env.SECRET_KEY);
   const user = await User.findByIdAndUpdate(id, { token }, { new: true });
   return user;
@@ -19,8 +19,11 @@ export const createUser = async (userData) => {
   const newUser = new User(userData);
   await newUser.hashPassword();
   await newUser.save();
-  const user = await updateUserWithToken(newUser._id);
-  return user;
+  const updatedUser = await updateUserWithToken(newUser._id);
+  return {
+    email: updatedUser.email,
+    subscription: updatedUser.subscription,
+  };
 };
 
 export const logoutUser = async (userId) => {

@@ -11,7 +11,7 @@ export async function listContacts(owner) {
 
 export async function getContactById(contactId, owner) {
   try {
-    const contact = await Contact.findById({ _id: contactId, owner });
+    const contact = await Contact.findOne({ _id: contactId, owner });
     return contact;
   } catch (error) {
     console.log(error.message);
@@ -21,7 +21,7 @@ export async function getContactById(contactId, owner) {
 
 export async function removeContact(contactId, owner) {
   try {
-    const deletedContact = await Contact.findByIdAndDelete({
+    const deletedContact = await Contact.findOneAndDelete({
       _id: contactId,
       owner,
     });
@@ -52,7 +52,7 @@ export async function updateContactById(
   { name, email, phone, owner, favorite }
 ) {
   try {
-    const updatedContact = await Contact.findByIdAndUpdate(
+    const updatedContact = await Contact.findOneAndUpdate(
       { _id: contactId, owner },
       { name, email, phone, favorite },
       { new: true }
@@ -65,7 +65,7 @@ export async function updateContactById(
 
 export async function updateStatusContact(contactId, favorite, owner) {
   try {
-    const updatedContact = await Contact.findByIdAndUpdate(
+    const updatedContact = await Contact.findOneAndUpdate(
       { _id: contactId, owner },
       { favorite },
       { new: true }

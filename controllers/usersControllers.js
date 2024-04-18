@@ -6,6 +6,7 @@ import {
   findUserByEmail,
   logoutUser,
   getCurrentUser,
+  updateUserWithToken,
 } from "../services/usersServices.js";
 import { User } from "../models/usersModel.js";
 import dotenv from "dotenv";
@@ -20,9 +21,9 @@ export const register = async (req, res, next) => {
       throw HttpError(409, "Email in use");
     }
     const newUser = await createUser(req.body);
-    res
-      .status(201)
-      .json({ email: newUser.email, subscription: newUser.subscription });
+    res.status(201).json({
+      user: newUser,
+    });
   } catch (err) {
     console.log(err);
     next(err);
@@ -40,6 +41,7 @@ export const login = async (req, res, next) => {
     if (!passwordCompare) {
       throw HttpError(401, "Email or password is wrong");
     }
+    await updateUserWithToken(user._id);
     const payload = {
       id: user._id,
     };
