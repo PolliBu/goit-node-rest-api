@@ -6,8 +6,11 @@ import {
   login,
   logout,
   current,
+  updateAvatar,
 } from "../controllers/usersControllers.js";
 import isAuthorization from "../middlewares/isAuthorization.js";
+// import multer from "multer";
+import { upload } from "../middlewares/upload.js";
 
 const usersRouter = express.Router();
 
@@ -18,5 +21,12 @@ usersRouter.post("/login", validateBody(loginSchema), login);
 usersRouter.post("/logout", isAuthorization, logout);
 
 usersRouter.get("/current", isAuthorization, current);
+
+usersRouter.patch(
+  "/avatars",
+  isAuthorization,
+  upload.single("avatar"),
+  updateAvatar
+);
 
 export default usersRouter;

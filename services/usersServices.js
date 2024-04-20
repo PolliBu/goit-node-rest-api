@@ -16,10 +16,13 @@ export const updateUserWithToken = async (id) => {
 };
 
 export const createUser = async (userData) => {
-  const newUser = new User(userData);
+  const { avatar, ...restUserData } = userData;
+  const newUser = new User(restUserData);
+  newUser.avatarURL = avatar;
   await newUser.hashPassword();
   await newUser.save();
   const updatedUser = await updateUserWithToken(newUser._id);
+
   return {
     email: updatedUser.email,
     subscription: updatedUser.subscription,
