@@ -6,7 +6,7 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const tempDir = path.join(__dirname, "../", "tmp");
+const tempDir = path.join(__dirname, "../tmp");
 
 const multerConfig = multer.diskStorage({
   destination: tempDir,

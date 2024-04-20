@@ -19,7 +19,7 @@ dotenv.config();
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
 
-export const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+const avatarsDir = path.join(__dirname, "../public/avatars");
 
 export const register = async (req, res, next) => {
   try {
