@@ -16,7 +16,9 @@ import fs from "fs/promises";
 
 dotenv.config();
 
-const __filename = new URL(import.meta.url).pathname;
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const avatarsDir = path.join(__dirname, "../public/avatars");
