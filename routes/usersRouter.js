@@ -9,7 +9,6 @@ import {
   updateAvatar,
 } from "../controllers/usersControllers.js";
 import isAuthorization from "../middlewares/isAuthorization.js";
-// import multer from "multer";
 import { upload } from "../middlewares/upload.js";
 
 const usersRouter = express.Router();

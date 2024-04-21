@@ -13,6 +13,7 @@ import { User } from "../models/usersModel.js";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs/promises";
+import { avatarJimp } from "../helpers/avatarJimp.js";
 
 dotenv.config();
 
@@ -107,7 +108,8 @@ export const updateAvatar = async (req, res, next) => {
     const filename = `${_id}_${originalname}`;
     const resultUpload = path.join(avatarsDir, filename);
     await fs.rename(tempUpload, resultUpload);
-    const avatarURL = path.join("avatars", filename);
+    const avatarURL = `/avatars/${filename}`;
+    await avatarJimp(resultUpload);
     await User.findByIdAndUpdate(_id, { avatarURL });
 
     res.json({
