@@ -13,7 +13,7 @@ import { User } from "../models/usersModel.js";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs/promises";
-import { avatarJimp } from "../helpers/avatarJimp.js";
+import Jimp from "jimp";
 
 dotenv.config();
 
@@ -103,13 +103,17 @@ export const current = async (req, res, next) => {
 
 export const updateAvatar = async (req, res, next) => {
   try {
+    if (!req.file) {
+      throw HttpError(400, "No file");
+    }
     const { _id } = req.user;
     const { path: tempUpload, originalname } = req.file;
     const filename = `${_id}_${originalname}`;
     const resultUpload = path.join(avatarsDir, filename);
     await fs.rename(tempUpload, resultUpload);
+    const image = await Jimp.read(resultUpload);
+    await image.resize(250, 250).quality(80).writeAsync(resultUpload);
     const avatarURL = `/avatars/${filename}`;
-    await avatarJimp(resultUpload);
     await User.findByIdAndUpdate(_id, { avatarURL });
 
     res.json({
