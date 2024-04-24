@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import contactsRouter from "./routes/contactsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
 
+import nodemailer from "nodemailer";
+
 dotenv.config();
 
 const { MONGODB_URL, PORT } = process.env;
@@ -42,3 +44,29 @@ app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
 });
+
+const { META_PASSWORD } = process.env;
+
+const nodemailerConfig = {
+  host: "smtp.meta.ua",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "Polina_Sykretna@meta.ua",
+    pass: META_PASSWORD,
+  },
+};
+
+const transporter = nodemailer.createTransport(nodemailerConfig);
+
+const emailOptions = {
+  from: "Polina_Sykretna@meta.ua",
+  to: "Polina_Sykretna@ukr.net",
+  subject: "Test email",
+  text: "<p><strong>Test email</strong> from localhost:3000</p>",
+};
+
+transporter
+  .sendMail(emailOptions)
+  .then(() => console.log("Email send success"))
+  .catch((error) => console.log(error.message));
