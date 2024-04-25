@@ -14,11 +14,13 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs/promises";
 import Jimp from "jimp";
-import { sendMail } from "../helpers/sendEmail.js";
+import { transporter } from "../helpers/transporter.js";
 import { nanoid } from "nanoid";
 import { fileURLToPath } from "url";
 
 dotenv.config();
+
+const { BASE_URL } = process.env;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,7 +41,13 @@ export const register = async (req, res, next) => {
       avatar: avatarURL,
       verificationToken,
     });
-    await sendMail(email, verificationToken);
+    const emailOptions = {
+      from: "Polina_Sykretna@meta.ua",
+      to: email,
+      subject: "Verify Email",
+      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click verify email</a>`,
+    };
+    await transporter.sendMail(emailOptions);
     res.status(201).json({
       user: newUser,
     });
@@ -75,10 +83,17 @@ export const resendVerifyEmail = async (req, res, next) => {
     if (!user) {
       throw HttpError(404, "User not found");
     }
-    if (user.verify) {
+    if (!user.verify) {
       throw HttpError(400, "Verification has already been passed");
     }
-    await sendMail(email, verificationToken);
+    const emailOptions = {
+      from: "Polina_Sykretna@meta.ua",
+      to: email,
+      subject: "Verify Email",
+      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click verify email</a>`,
+    };
+
+    await transporter.sendMail(emailOptions);
     res.status(200).json({ message: "Verification email sent" });
   } catch (error) {
     next(error);
@@ -91,6 +106,9 @@ export const login = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (!user) {
       throw HttpError(401, "Email or password is wrong");
+    }
+    if (!user.verify) {
+      throw HttpError(401, "Email not verify");
     }
     const passwordCompare = await bcryptjs.compare(password, user.password);
     if (!passwordCompare) {

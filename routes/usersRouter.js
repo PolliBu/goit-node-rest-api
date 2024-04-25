@@ -1,5 +1,9 @@
 import express from "express";
-import { registerSchema, loginSchema } from "../schemas/usersSchemas.js";
+import {
+  registerSchema,
+  loginSchema,
+  emailSchema,
+} from "../schemas/usersSchemas.js";
 import validateBody from "../helpers/validateBody.js";
 import {
   register,
@@ -32,6 +36,6 @@ usersRouter.patch(
 
 usersRouter.get("/verify/:verificationToken", verifyEmail);
 
-usersRouter.post("/verify", validateBody(registerSchema), resendVerifyEmail);
+usersRouter.post("/verify", validateBody(emailSchema), resendVerifyEmail);
 
 export default usersRouter;
