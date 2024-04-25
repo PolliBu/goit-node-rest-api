@@ -9,19 +9,23 @@ export const findUserByEmail = async (email) => {
   return user;
 };
 
-export const updateUserWithToken = async (id) => {
+export const updateUserWithToken = async (id, verificationToken) => {
   const token = jwt.sign({ id }, process.env.SECRET_KEY);
-  const user = await User.findByIdAndUpdate(id, { token }, { new: true });
+  const user = await User.findByIdAndUpdate(
+    id,
+    { token, verificationToken },
+    { new: true }
+  );
   return user;
 };
 
-export const createUser = async (userData) => {
+export const createUser = async (userData, verificationToken) => {
   const { avatar, ...restUserData } = userData;
   const newUser = new User(restUserData);
   newUser.avatarURL = avatar;
   await newUser.hashPassword();
   await newUser.save();
-  const updatedUser = await updateUserWithToken(newUser._id);
+  const updatedUser = await updateUserWithToken(newUser._id, verificationToken);
 
   return {
     email: updatedUser.email,

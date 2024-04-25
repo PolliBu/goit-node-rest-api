@@ -7,6 +7,8 @@ import {
   logout,
   current,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 } from "../controllers/usersControllers.js";
 import isAuthorization from "../middlewares/isAuthorization.js";
 import { upload } from "../middlewares/upload.js";
@@ -27,5 +29,9 @@ usersRouter.patch(
   upload.single("avatar"),
   updateAvatar
 );
+
+usersRouter.get("/verify/:verificationToken", verifyEmail);
+
+usersRouter.post("/verify", validateBody(registerSchema), resendVerifyEmail);
 
 export default usersRouter;

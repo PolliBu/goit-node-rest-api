@@ -14,10 +14,11 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs/promises";
 import Jimp from "jimp";
+import { sendMail } from "../helpers/sendEmail.js";
+import { nanoid } from "nanoid";
+import { fileURLToPath } from "url";
 
 dotenv.config();
-
-import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,13 +33,55 @@ export const register = async (req, res, next) => {
       throw HttpError(409, "Email in use");
     }
     const avatarURL = gravatar.url(email);
-    const newUser = await createUser({ ...req.body, avatar: avatarURL });
+    const verificationToken = nanoid();
+    const newUser = await createUser({
+      ...req.body,
+      avatar: avatarURL,
+      verificationToken,
+    });
+    await sendMail(email, verificationToken);
     res.status(201).json({
       user: newUser,
     });
   } catch (err) {
-    console.log(err);
     next(err);
+  }
+};
+
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    if (!verificationToken) {
+      throw new HttpError(400, "Verification token is required");
+    }
+    const user = await User.findOne({ verificationToken });
+    if (!user) {
+      return next(HttpError(404, "User not found"));
+    }
+    await User.findByIdAndUpdate(user._id, {
+      verify: true,
+      verificationToken: "",
+    });
+    res.status(200).json({ message: "Verification successful" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resendVerifyEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+    if (user.verify) {
+      throw HttpError(400, "Verification has already been passed");
+    }
+    await sendMail(email, verificationToken);
+    res.status(200).json({ message: "Verification email sent" });
+  } catch (error) {
+    next(error);
   }
 };
 
