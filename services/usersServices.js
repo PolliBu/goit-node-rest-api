@@ -26,7 +26,6 @@ export const createUser = async (userData, verificationToken) => {
   await newUser.hashPassword();
   await newUser.save();
   const updatedUser = await updateUserWithToken(newUser._id, verificationToken);
-
   return {
     email: updatedUser.email,
     subscription: updatedUser.subscription,
@@ -36,10 +35,8 @@ export const createUser = async (userData, verificationToken) => {
 export const logoutUser = async (userId) => {
   const user = await User.findById(userId);
   if (!user) return null;
-
   user.token = null;
   await user.save();
-
   return user;
 };
 

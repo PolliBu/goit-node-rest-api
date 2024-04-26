@@ -36,6 +36,6 @@ usersRouter.patch(
 
 usersRouter.get("/verify/:verificationToken", verifyEmail);
 
-usersRouter.post("/verify", validateBody(emailSchema), resendVerifyEmail);
+usersRouter.post("/verify", resendVerifyEmail, validateBody(emailSchema));
 
 export default usersRouter;

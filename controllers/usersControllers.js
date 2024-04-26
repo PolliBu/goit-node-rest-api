@@ -42,7 +42,7 @@ export const register = async (req, res, next) => {
       verificationToken,
     });
     const emailOptions = {
-      from: "Polina_Sykretna@meta.ua",
+      from: "Polina_Sykretna1@meta.ua",
       to: email,
       subject: "Verify Email",
       html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click verify email</a>`,
@@ -79,6 +79,9 @@ export const verifyEmail = async (req, res, next) => {
 export const resendVerifyEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
+    if (!email) {
+      throw HttpError(400, "missing required field email");
+    }
     const user = await User.findOne({ email });
     if (!user) {
       throw HttpError(404, "User not found");
@@ -86,13 +89,16 @@ export const resendVerifyEmail = async (req, res, next) => {
     if (!user.verify) {
       throw HttpError(400, "Verification has already been passed");
     }
+    const newVerificationToken = nanoid();
+    await User.findByIdAndUpdate(user._id, {
+      verificationToken: newVerificationToken,
+    });
     const emailOptions = {
-      from: "Polina_Sykretna@meta.ua",
+      from: "Polina_Sykretna1@meta.ua",
       to: email,
       subject: "Verify Email",
       html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click verify email</a>`,
     };
-
     await transporter.sendMail(emailOptions);
     res.status(200).json({ message: "Verification email sent" });
   } catch (error) {
@@ -176,7 +182,6 @@ export const updateAvatar = async (req, res, next) => {
     await image.resize(250, 250).quality(80).writeAsync(resultUpload);
     const avatarURL = `/avatars/${filename}`;
     await User.findByIdAndUpdate(_id, { avatarURL });
-
     res.json({
       avatarURL,
     });
