@@ -3,11 +3,8 @@ import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-
 import contactsRouter from "./routes/contactsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
-
-import nodemailer from "nodemailer";
 
 dotenv.config();
 
