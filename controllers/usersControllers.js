@@ -86,7 +86,7 @@ export const resendVerifyEmail = async (req, res, next) => {
     if (!user) {
       throw HttpError(404, "User not found");
     }
-    if (!user.verify) {
+    if (user.verify) {
       throw HttpError(400, "Verification has already been passed");
     }
     const newVerificationToken = nanoid();
