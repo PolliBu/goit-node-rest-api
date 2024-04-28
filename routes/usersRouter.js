@@ -1,5 +1,9 @@
 import express from "express";
-import { registerSchema, loginSchema } from "../schemas/usersSchemas.js";
+import {
+  registerSchema,
+  loginSchema,
+  emailSchema,
+} from "../schemas/usersSchemas.js";
 import validateBody from "../helpers/validateBody.js";
 import {
   register,
@@ -7,6 +11,8 @@ import {
   logout,
   current,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 } from "../controllers/usersControllers.js";
 import isAuthorization from "../middlewares/isAuthorization.js";
 import { upload } from "../middlewares/upload.js";
@@ -27,5 +33,9 @@ usersRouter.patch(
   upload.single("avatar"),
   updateAvatar
 );
+
+usersRouter.get("/verify/:verificationToken", verifyEmail);
+
+usersRouter.post("/verify", resendVerifyEmail, validateBody(emailSchema));
 
 export default usersRouter;
